@@ -75,7 +75,6 @@ define(function (require, exports, module) {
                     state.justMatchedKeyword = true;
                     return "keyword";
                 } else if(stream.match(whitespace)) {
-                    console.log("whitespace");
                     state.justMatchedKeyword = false;
                     return null;
                 }else {
