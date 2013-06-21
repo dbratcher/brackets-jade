@@ -1,0 +1,12 @@
+{
+    "name": "com.example.brackets-jade",
+    "title": "brackets-jade",
+    "description": "Provides jade syntax highlight via a CodeMirror mode for Brackets.",
+    "homepage": "",
+    "version": "1.0.0",
+    "author": "Drew Bratcher",
+    "license": "MIT",
+    "engines": {
+        "brackets": ">=0.21.0"
+    }
+}
