@@ -8,7 +8,6 @@
 define(function (require, exports, module) {
     'use strict';
 
-    console.log("Start Jade Syntax Highlighting Extension2");
 
     var LanguageManager = brackets.getModule("language/LanguageManager");
 
@@ -96,10 +95,8 @@ LanguageManager.defineLanguage("jade", {
     name: "Jade",
     mode: "jade",
     fileExtensions: ["jade"],
-    blockComment: ["{-", "-}"],
-    lineComment: ["--"]
+    blockComment: ["/*", "*/"],
+    lineComment: ["//"]
 });
-
-console.log("End Jade Highlighting2");
 
 });

@@ -1,6 +1,6 @@
 {
     "name": "com.example.brackets-jade",
-    "title": "brackets-jade",
+    "title": "Jade Syntax Highlighting",
     "description": "Provides jade syntax highlight via a CodeMirror mode for Brackets.",
     "homepage": "",
     "version": "1.0.0",
