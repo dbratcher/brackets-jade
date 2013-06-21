@@ -21,6 +21,6 @@ It should just work on .jade files. Submit issues on the github if you'd like ad
 
 These sites and people were helpful in creating this extension.
 
-http://marijnhaverbeke.nl/blog/codemirror-mode-system.html
-http://codemirror.net/doc/manual.html#modeapi
-https://github.com/davidderaedt/Brackets-extension-toolkit
+- http://marijnhaverbeke.nl/blog/codemirror-mode-system.html
+- http://codemirror.net/doc/manual.html#modeapi
+- https://github.com/davidderaedt/Brackets-extension-toolkit
