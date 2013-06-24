@@ -14,8 +14,9 @@ define(function (require, exports, module) {
     var symbol_regex1 = /^(?:~|!|%|\^|\*|\+|=|\\|:|;|,|\/|\?|&|<|>|\|)/;
     var open_paren_regex = /^(\(|\[)/;
     var close_paren_regex = /^(\)|\])/;
-    var keyword_regex1 = /^(if|else|return|var|function|include|doctype)/;
-    var keyword_regex2 = /^(#|{|}|\.|each|in)/;
+    var keyword_regex1 = /^(if|else|return|var|function|include|doctype|each)/;
+    var keyword_regex2 = /^(#|{|}|\.)/;
+    var keyword_regex3 = /^(in)/;
     var html_regex1 = /^(html|head|title|meta|link|script|body|br|div|input|span|a|img)/;
     var html_regex2 = /^(h1|h2|h3|h4|h5|p|strong|em)/;
     var whitespace = /^(\s)/;
@@ -53,6 +54,7 @@ define(function (require, exports, module) {
                     stream.eatSpace();
                     if(stream.match(keyword_regex1)) {
                         state.justMatchedKeyword = true;
+                        stream.eatSpace();
                         return "keyword";
                     }
                     if(stream.match(html_regex1) || stream.match(html_regex2)) {
@@ -60,6 +62,13 @@ define(function (require, exports, module) {
                         return "variable";
                     }
                     return null;   
+                } else if(stream.eatSpace()) {
+                    state.justMatchedKeyword = false;
+                    if(stream.match(keyword_regex3) && stream.eatSpace()) {
+                        state.justMatchedKeyword = true;
+                        return "keyword";
+                    }
+                    return null;
                 } else if(stream.match(symbol_regex1)) {
                     state.justMatchedKeyword = false;
                     return "atom";
@@ -70,14 +79,14 @@ define(function (require, exports, module) {
                 } else if(stream.match(close_paren_regex)) { 
                     state.afterParen = false;
                     state.justMatchedKeyword = true;
-                    return "keyword";
+                    return "def";
                 } else if(stream.match(keyword_regex2)) {
                     state.justMatchedKeyword = true;
                     return "keyword";
-                } else if(stream.match(whitespace)) {
+                } else if(stream.eatSpace()) {
                     state.justMatchedKeyword = false;
                     return null;
-                }else {
+                } else {
                     var ch = stream.next();
                     if(state.justMatchedKeyword){
                         return "property";
