@@ -11,15 +11,14 @@ define(function (require, exports, module) {
 
     var LanguageManager = brackets.getModule("language/LanguageManager");
 
-    var symbol_regex1 = /^(?:~|!|%|\^|\*|\+|=|\\|:|;|,|\/|\?|&|<|>|\|)/;
+    var symbol_regex1 = /^(?:~|!|%|\^|\*|\+|=|:|;|,|\?|&|<|>|\|)/;
     var open_paren_regex = /^(\(|\[)/;
     var close_paren_regex = /^(\)|\])/;
-    var keyword_regex1 = /^(if|else|return|var|function|include|doctype|each)/;
+    var keyword_regex1 = /^(if|else|return|var|function|include|doctype|each|mixin)/;
     var keyword_regex2 = /^(#|{|}|\.)/;
     var keyword_regex3 = /^(in)/;
     var html_regex1 = /^(html|head|title|meta|link|script|body|br|div|input|span|a|img)/;
     var html_regex2 = /^(h1|h2|h3|h4|h5|p|strong|em)/;
-    var whitespace = /^(\s)/;
     
     CodeMirror.defineMode("jade", function () {
         return {
@@ -50,8 +49,7 @@ define(function (require, exports, module) {
                     }
                     state.justMatchedKeyword = false;
                     return "string"; // Token style
-                } else if(stream.sol()) {
-                    stream.eatSpace();
+                } else if(stream.sol() && stream.eatSpace()) {
                     if(stream.match(keyword_regex1)) {
                         state.justMatchedKeyword = true;
                         stream.eatSpace();
@@ -60,15 +58,20 @@ define(function (require, exports, module) {
                     if(stream.match(html_regex1) || stream.match(html_regex2)) {
                         state.justMatchedKeyword = true;
                         return "variable";
-                    }
-                    return null;   
+                    } 
+                } else if(stream.sol() && stream.match(keyword_regex1)) {
+                    state.justMatchedKeyword = true;
+                    stream.eatSpace();
+                    return "keyword";
+                } else if(stream.sol() && (stream.match(html_regex1) || stream.match(html_regex2))) {
+                    state.justMatchedKeyword = true;
+                    return "variable";
                 } else if(stream.eatSpace()) {
                     state.justMatchedKeyword = false;
                     if(stream.match(keyword_regex3) && stream.eatSpace()) {
                         state.justMatchedKeyword = true;
                         return "keyword";
                     }
-                    return null;
                 } else if(stream.match(symbol_regex1)) {
                     state.justMatchedKeyword = false;
                     return "atom";
@@ -85,7 +88,6 @@ define(function (require, exports, module) {
                     return "keyword";
                 } else if(stream.eatSpace()) {
                     state.justMatchedKeyword = false;
-                    return null;
                 } else {
                     var ch = stream.next();
                     if(state.justMatchedKeyword){
@@ -93,8 +95,8 @@ define(function (require, exports, module) {
                     } else if(state.afterParen) {
                         return "property";
                     }
-                    return null;
                 }
+                return null;
             }
         };
     });
@@ -103,7 +105,7 @@ LanguageManager.defineLanguage("jade", {
     name: "Jade",
     mode: "jade",
     fileExtensions: ["jade"],
-    blockComment: ["/*", "*/"],
+    blockComment: ["//", "/*"],
     lineComment: ["//"]
 });
 
