@@ -19,6 +19,7 @@ define(function (require, exports, module) {
     var keyword_regex3 = /^(in)/;
     var html_regex1 = /^(html|head|title|meta|link|script|body|br|div|input|span|a|img)/;
     var html_regex2 = /^(h1|h2|h3|h4|h5|p|strong|em)/;
+    var comment_regex = /^(\/\/|\/\/-)/;
     
     CodeMirror.defineMode("jade", function () {
         return {
@@ -54,11 +55,17 @@ define(function (require, exports, module) {
                         state.justMatchedKeyword = true;
                         stream.eatSpace();
                         return "keyword";
-                    }
+                    } else if(stream.match(comment_regex)) {
+                        stream.skipToEnd();
+                        return "comment";
+                    } 
                     if(stream.match(html_regex1) || stream.match(html_regex2)) {
                         state.justMatchedKeyword = true;
                         return "variable";
                     } 
+                } else if(stream.sol() && stream.match(comment_regex)) {
+                    stream.skipToEnd();
+                    return "comment";
                 } else if(stream.sol() && stream.match(keyword_regex1)) {
                     state.justMatchedKeyword = true;
                     stream.eatSpace();
@@ -105,8 +112,8 @@ LanguageManager.defineLanguage("jade", {
     name: "Jade",
     mode: "jade",
     fileExtensions: ["jade"],
-    blockComment: ["//", "/*"],
-    lineComment: ["//"]
+    blockComment: ["//","//"],
+    lineComment: ["//-","//"]
 });
 
 });

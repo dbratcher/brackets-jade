@@ -3,7 +3,7 @@
     "title": "Jade Syntax Highlighting",
     "description": "Provides jade syntax highlight via a CodeMirror mode for Brackets.",
     "homepage": "",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "Drew Bratcher",
     "license": "MIT",
     "engines": {
