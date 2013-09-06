@@ -46,7 +46,7 @@ define(function (require, exports, module) {
                         stream.next(); // Skip quote
                         state.inString = false; // Clear flag
                     } else {
-                        stream.skipToEnd(); // Rest of line is string
+                        state.inString = false;
                     }
                     state.justMatchedKeyword = false;
                     return "string"; // Token style
