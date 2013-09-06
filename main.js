@@ -25,6 +25,8 @@ define(function (require, exports, module) {
         return {
             startState: function () {
                 return {
+                    inComment: false,
+                    comment_indent: 0,
                     inString: false,
                     stringType: "",
                     beforeTag: true,
@@ -39,6 +41,11 @@ define(function (require, exports, module) {
                     stream.next(); // Skip quote
                     state.inString = true; // Update state
                 }
+                if(state.inComment) {
+                  if(stream.indentation()<=state.comment_indent) {
+                    state.inComment = false;
+                  }
+                }
 
                 //return state
                 if (state.inString) {
@@ -50,12 +57,17 @@ define(function (require, exports, module) {
                     }
                     state.justMatchedKeyword = false;
                     return "string"; // Token style
+                } else if(state.inComment) {
+                  stream.skipToEnd();
+                  return "comment";
                 } else if(stream.sol() && stream.eatSpace()) {
                     if(stream.match(keyword_regex1)) {
                         state.justMatchedKeyword = true;
                         stream.eatSpace();
                         return "keyword";
                     } else if(stream.match(comment_regex)) {
+                        state.comment_indent = stream.indentation();
+                        state.inComment = true;
                         stream.skipToEnd();
                         return "comment";
                     } 
@@ -64,6 +76,8 @@ define(function (require, exports, module) {
                         return "variable";
                     } 
                 } else if(stream.sol() && stream.match(comment_regex)) {
+                    state.comment_indent = stream.indentation();
+                    state.inComment = true;
                     stream.skipToEnd();
                     return "comment";
                 } else if(stream.sol() && stream.match(keyword_regex1)) {
