@@ -11,7 +11,7 @@ define(function (require, exports, module) {
 
     var LanguageManager = brackets.getModule("language/LanguageManager");
 
-    var symbol_regex1 = /^(?:~|!|%|\^|\*|\+|=|:|;|,|\?|&|<|>|\|)/;
+    var symbol_regex1 = /^(?:~|!|%|\^|\*|\+|\-|=|:|;|,|\?|&|<|>|\|)/;
     var open_paren_regex = /^(\(|\[)/;
     var close_paren_regex = /^(\)|\])/;
     var keyword_regex1 = /^(if|else|return|var|function|include|doctype|each|mixin)/;
@@ -31,16 +31,28 @@ define(function (require, exports, module) {
                     stringType: "",
                     beforeTag: true,
                     justMatchedKeyword: false,
+                    justMatchedSymbol: false,
                     afterParen: false
                 };
             },
             token: function (stream, state) {
                 //check for state changes
-                if (!state.inString && ((stream.peek() == '"') || (stream.peek() == "'"))) {
+                var next_state = false;
+                if (state.justMatchedSymbol && !state.inString) {
+                  if((stream.peek() == '"') || (stream.peek() == "'")) {
                     state.stringType = stream.peek();
                     stream.next(); // Skip quote
                     state.inString = true; // Update state
+                    next_state = true;
+                  } else if(stream.eatSpace() && ((stream.peek() == '"') || (stream.peek() == "'"))) {
+                    state.stringType = stream.peek();
+                    stream.next(); // Skip quote
+                    state.inString = true; // Update state
+                    next_state = true;
+                  }
                 }
+                state.justMatchedSymbol = next_state;
+              
                 if(state.inComment) {
                   if(stream.indentation()<=state.comment_indent) {
                     state.inComment = false;
@@ -50,8 +62,16 @@ define(function (require, exports, module) {
                 //return state
                 if (state.inString) {
                     if (stream.skipTo(state.stringType)) { // Quote found on this line
-                        stream.next(); // Skip quote
-                        state.inString = false; // Clear flag
+                        stream.backUp(1);
+                        if(stream.peek()=='\\') {
+                          //escape quote and continue
+                          stream.next();
+                          stream.next();
+                        } else {
+                          stream.next(); // Skip char
+                          stream.next(); // Skip quote
+                          state.inString = false; // Clear flag
+                        }
                     } else {
                         state.inString = false;
                     }
@@ -94,13 +114,16 @@ define(function (require, exports, module) {
                         return "keyword";
                     }
                 } else if(stream.match(symbol_regex1)) {
+                    state.justMatchedSymbol = true;
                     state.justMatchedKeyword = false;
                     return "atom";
                 } else if(stream.match(open_paren_regex)) {
+                    state.justMatchedSymbol = true;
                     state.afterParen = true;
                     state.justMatchedKeyword = true;
                     return "def";
                 } else if(stream.match(close_paren_regex)) { 
+                    state.justMatchedSymbol = true;
                     state.afterParen = false;
                     state.justMatchedKeyword = true;
                     return "def";
