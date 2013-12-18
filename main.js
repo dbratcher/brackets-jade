@@ -11,7 +11,7 @@ define(function (require, exports, module) {
 
     var LanguageManager = brackets.getModule("language/LanguageManager");
 
-    var symbol_regex1 = /^(?:~|!|%|\^|\*|\+|\-|=|:|;|,|\?|&|<|>|\|)/;
+    var symbol_regex1 = /^(?:~|!|%|\^|\*|\+|=|:|;|,|\?|&|<|>|\|)/;
     var open_paren_regex = /^(\(|\[)/;
     var close_paren_regex = /^(\)|\])/;
     var keyword_regex1 = /^(if|else|return|var|function|include|doctype|each|mixin)/;
@@ -49,6 +49,11 @@ define(function (require, exports, module) {
                     stream.next(); // Skip quote
                     state.inString = true; // Update state
                     next_state = true;
+                  } else if(stream.match(comment_regex)){
+                    state.comment_indent = stream.indentation();
+                    state.inComment = true;
+                    stream.skipToEnd();
+                    return "comment";
                   }
                 }
                 state.justMatchedSymbol = next_state;
