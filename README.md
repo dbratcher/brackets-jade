@@ -2,9 +2,15 @@
 
 Provides jade syntax highlight via a CodeMirror mode for Brackets.
 
+##Install from Repository
+
+1. Open the the Extension Manager from the Brackets File menu
+2. In the search bar, type jade
+3. Press the Install button next to Jade Syntax Highlighting
+
 ##Install from URL
 
-1. Open the the Extension Manager from the File menu
+1. Open the the Extension Manager from the Brackets File menu
 2. Copy paste the URL of the github repo or zip file
 
 ##Install from file system
